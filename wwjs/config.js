@@ -26,6 +26,16 @@ const { Client, LocalAuth } = wwcli;
 const whatsapp = new Client({
   puppeteer: {
     headless: true,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-infobars",
+      "--disable-extensions",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--no-first-run",
+      "--no-zygote",
+    ],
   },
   authStrategy: new LocalAuth({
     clientId: CLIENT_ID,
