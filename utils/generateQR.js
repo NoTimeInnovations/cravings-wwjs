@@ -14,10 +14,12 @@ async function generateQR(qr) {
   await writeQRToFile();
 
   async function writeQRToFile() {
+    const now = new Date();
+    const lastUpdated = now.toLocaleString();
     fs.truncateSync("pages/login.html", 0);
     fs.writeFileSync(
       "pages/login.html",
-      `<html><body><img src="${qrUrl}" alt="QR Code"></body></html>`
+      `<html><body><img src="${qrUrl}" alt="QR Code"><p>Last updated: ${lastUpdated}</p></body></html>`
     );
   }
 
