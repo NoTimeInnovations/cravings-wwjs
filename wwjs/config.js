@@ -42,8 +42,8 @@ const whatsapp = new Client({
   }),
 });
 
-whatsapp.on("qr", (qr) => {
-  generateQR(qr);
+whatsapp.on("qr", async(qr) => {
+  await generateQR(qr);
 });
 
 whatsapp.on("loading_screen", () => {

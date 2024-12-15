@@ -6,15 +6,18 @@ export async function getUserPhone() {
 
     const users = userSnapshot.docs.map(doc => doc.data());
     const userPhones = users.map(user => {
-      const trimmedPhone = user?.phone?.replace(/^(\+91|0)/, '');
+      const trimmedPhone = user?.phone?.replace(/^(\+91|0)/, '').replace(/\s+/g, '');
       if (trimmedPhone) return `91${trimmedPhone}@c.us`;
-    });
+    }).filter(Boolean);
 
-    console.log(userPhones);
+    const uniqueUserPhones = [...new Set(userPhones)];
+
+    console.log(uniqueUserPhones);
     
-    return ['919447156765@c.us'];
+    return uniqueUserPhones;
     
   } catch (error) {
     console.error("Failed to get user phone\n\n" + error);
   }
 }
+

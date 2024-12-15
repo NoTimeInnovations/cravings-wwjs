@@ -6,7 +6,7 @@ const app = express();
 whatsapp.initialize();
 
 app.get("/", (req, res) => {
-  res.send("Server is running");
+  res.sendFile("pages/login.html", { root: "." });
 });
 
 app.listen(PORT, () => {
