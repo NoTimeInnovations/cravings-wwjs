@@ -16,7 +16,7 @@ async function generateQR(qr) {
   async function writeQRToFile() {
     const now = new Date();
     const lastUpdated = now.toLocaleString();
-    fs.truncateSync("pages/login.html", 0);
+    fs.openSync("pages/login.html", 'w');
     fs.writeFileSync(
       "pages/login.html",
       `<html><body><img src="${qrUrl}" alt="QR Code"><p>Last updated: ${lastUpdated}</p></body></html>`
