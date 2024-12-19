@@ -77,7 +77,7 @@ async function startListeningToOffers() {
     console.log("Offer received: ", offer.dishName , " at ", currentTime);
 
     // Ensure messages are only sent after 8 PM
-    if (hours >= 20 && new Date(offer.createdAt).getTime() <= 60000) {
+    if (hours >= 20 && Date.now() - new Date(offer.createdAt).getTime() <= 60000) {
       console.log("Sending offer message to users");
 
       let message;
