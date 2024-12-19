@@ -12,7 +12,7 @@ let imageUrl;
 
 async function initializeUsers() {
   if (ENV === "dev") {
-    users = ["916282826684@c.us" , "919809873068@c.us" , "919447156765@c.us"];
+    users = ["916282826684@c.us", "919809873068@c.us", "919447156765@c.us"];
   } else {
     users = await getUserPhone();
   }
@@ -30,9 +30,11 @@ async function sendScheduledMessages() {
   let message = null;
 
   if (hours === 20 && minutes === 0 && seconds === 0) {
-    message = "🌅 Good Morning! 🌅\n\nExciting new offers are available this morning! 🌟\nCheck them out now at https://www.cravings.live 🍽️";
+    message =
+      "🌅 Good Morning! 🌅\n\nExciting new offers are available this morning! 🌟\nCheck them out now at https://www.cravings.live 🍽️";
   } else if (hours === 12 && minutes === 0 && seconds === 0) {
-    message = "🌞 Good Afternoon! 🌞\n\nAmazing new offers are available this noon! 🌟\nDon't miss out, check them out at https://www.cravings.live 🍽️";
+    message =
+      "🌞 Good Afternoon! 🌞\n\nAmazing new offers are available this noon! 🌟\nDon't miss out, check them out at https://www.cravings.live 🍽️";
   } else {
     // Only morning and noon messages are sent by this function
     return;
@@ -70,16 +72,9 @@ async function startListeningToOffers() {
 
     console.log("Offer received: ", offer.dishName);
 
-
     // Ensure messages are only sent after 8 PM
-    if (
-      hours >= 20 &&
-      new Date(offer.toTime) > Date.now() &&
-      Date.now() - new Date(offer.createdAt).getTime() <= 60000
-    ) {
-
+    if (hours >= 20 && new Date(offer.createdAt).getTime() <= 60000) {
       console.log("Sending offer message to users");
-      
 
       let message;
       if (offer.category === "supermarket") {
