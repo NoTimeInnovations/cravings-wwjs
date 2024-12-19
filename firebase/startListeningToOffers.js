@@ -3,7 +3,6 @@ import { ENV } from "../utils/env.js";
 import { whatsapp } from "../wwjs/config.js";
 import { rtdb } from "./admin.js";
 import { getUserPhone } from "./getUserPhone.js";
-import { readFileSync } from "fs";
 
 const { MessageMedia } = wwjs;
 
@@ -69,12 +68,19 @@ async function startListeningToOffers() {
     const hours = now.getHours();
     imageUrl = offer.dishImage;
 
+    console.log("Offer received: ", offer.dishName);
+
+
     // Ensure messages are only sent after 8 PM
     if (
       hours >= 20 &&
       new Date(offer.toTime) > Date.now() &&
       Date.now() - new Date(offer.createdAt).getTime() <= 60000
     ) {
+
+      console.log("Sending offer message to users");
+      
+
       let message;
       if (offer.category === "supermarket") {
         message = `🛒 New CraveMart Offer! 🛒\n\nProduct: ${offer.dishName}\nPrice: ${offer.newPrice}\n\nCheck out our latest offer: https://cravings.live/offers/${snapshot.key}/\n\nHurry, don't miss out! 🏃‍♂️💨`;
