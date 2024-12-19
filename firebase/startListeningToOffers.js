@@ -13,7 +13,7 @@ let imageUrl;
 
 async function initializeUsers() {
   if (ENV === "dev") {
-    users = ["916282826684@c.us"];
+    users = ["916282826684@c.us" , "919809873068@c.us" , "919447156765@c.us"];
   } else {
     users = await getUserPhone();
   }
