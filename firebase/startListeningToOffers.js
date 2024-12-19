@@ -20,6 +20,7 @@ async function initializeUsers() {
 
 // Function to send scheduled messages at specific times
 async function sendScheduledMessages() {
+  
   if (users.length === 0) await initializeUsers();
 
   const now = new Date();
@@ -68,9 +69,12 @@ async function startListeningToOffers() {
 
     const now = new Date();
     const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const currentTime = `${hours}:${minutes}:${seconds}`;
     imageUrl = offer.dishImage;
 
-    console.log("Offer received: ", offer.dishName);
+    console.log("Offer received: ", offer.dishName , " at ", currentTime);
 
     // Ensure messages are only sent after 8 PM
     if (hours >= 20 && new Date(offer.createdAt).getTime() <= 60000) {
