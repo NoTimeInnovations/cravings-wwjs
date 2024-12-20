@@ -30,7 +30,7 @@ async function sendScheduledMessages() {
 
   let message = null;
 
-  if (hours === 20 && minutes === 0 && seconds === 0) {
+  if (hours === 8 && minutes === 0 && seconds === 0) {
     message =
       "🌅 Good Morning! 🌅\n\nExciting new offers are available this morning! 🌟\nCheck them out now at https://www.cravings.live 🍽️";
   } else if (hours === 12 && minutes === 0 && seconds === 0) {
