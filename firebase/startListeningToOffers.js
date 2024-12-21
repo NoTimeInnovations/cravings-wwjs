@@ -76,6 +76,7 @@ async function startListeningToOffers() {
     imageUrl = offer.dishImage;
 
     console.log("Offer received: ", offer.dishName, " at ", currentTime);
+    const media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
 
     // Ensure messages are only sent after 8 PM
     if (
@@ -93,7 +94,7 @@ async function startListeningToOffers() {
 
       for (const user of users) {
         try {
-          await whatsapp.sendMessage(user, message);
+          await whatsapp.sendMessage(user, message , { media });
         } catch (error) {
           console.error(
             "Failed to send offer link to " + user + "\n\n" + error
