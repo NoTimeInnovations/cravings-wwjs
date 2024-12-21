@@ -1,6 +1,7 @@
 import { sendMessage, whatsapp } from "../wwjs/config.js";
 import fs from 'fs';
 import path from 'path';
+import { getUserPhone } from "../firebase/getUserPhone.js";
 
 
 function test(){
@@ -31,7 +32,7 @@ function clearLog(){
 }
 
 async function viewUsers(){
-  const users = await whatsapp.getUsers();
+  const users = await getUserPhone();
   const usersString = users.join('\n');
   sendMessage(usersString);
 }
