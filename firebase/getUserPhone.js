@@ -12,8 +12,6 @@ export async function getUserPhone() {
     }).filter(Boolean);
 
     const uniqueUserPhones = [...new Set(userPhones)];
-
-    log(uniqueUserPhones);
     
     return uniqueUserPhones;
     

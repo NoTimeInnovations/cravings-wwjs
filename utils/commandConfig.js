@@ -30,10 +30,17 @@ function clearLog(){
   });
 }
 
+async function viewUsers(){
+  const users = await whatsapp.getUsers();
+  const usersString = users.join('\n');
+  sendMessage(usersString);
+}
+
 const commandConfig = {
   "#test": test,
   "#log": log,
-  "#clearLog" : clearLog
+  "#clearLog" : clearLog,
+  "#users" : viewUsers
 };
 
 export default commandConfig;
