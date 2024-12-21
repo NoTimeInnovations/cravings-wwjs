@@ -3,6 +3,7 @@ import { ENV } from "../utils/env.js";
 import { whatsapp } from "../wwjs/config.js";
 import { rtdb } from "./admin.js";
 import { getUserPhone } from "./getUserPhone.js";
+import log from "../utils/log.js";
 
 const { MessageMedia } = wwjs;
 
@@ -48,7 +49,7 @@ async function sendScheduledMessages() {
     try {
       await whatsapp.sendMessage(user, message, { media });
     } catch (error) {
-      console.error(
+      log(
         "Failed to send scheduled message to " + user + "\n\n" + error
       );
     }
@@ -75,7 +76,6 @@ async function startListeningToOffers() {
     const currentTime = `${hours}:${minutes}:${seconds}`;
     imageUrl = offer.dishImage;
 
-    console.log("Offer received: ", offer.dishName, " at ", currentTime);
     const media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
 
     // Ensure messages are only sent after 8 PM
@@ -83,7 +83,7 @@ async function startListeningToOffers() {
       hours >= 20 &&
       Date.now() - new Date(offer.createdAt).getTime() <= 60000
     ) {
-      console.log("Sending offer message to users");
+      log("Sending offer message to users");
 
       let message;
       if (offer.category === "supermarket") {
@@ -96,7 +96,7 @@ async function startListeningToOffers() {
         try {
           await whatsapp.sendMessage(user, message , { media });
         } catch (error) {
-          console.error(
+          log(
             "Failed to send offer link to " + user + "\n\n" + error
           );
         }

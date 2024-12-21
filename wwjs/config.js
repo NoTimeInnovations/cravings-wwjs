@@ -54,7 +54,7 @@ function sendMessage(message, to = ADMIN_CHAT_ID) {
   try {
     whatsapp.sendMessage(to, message);
   } catch (error) {
-    console.error("Failed to send message to " + to + "\n\n" + error);
+    log("Failed to send message to " + to + "\n\n" + error);
   }
 }
 
@@ -62,7 +62,7 @@ function reply(msg, message) {
   try {
     msg.reply(message);
   } catch (error) {
-    console.error("Failed to reply to message of " + msg.from + "\n\n" + error);
+    log("Failed to reply to message of " + msg.from + "\n\n" + error);
   }
 }
 

@@ -1,3 +1,4 @@
+import log from "../utils/log.js";
 import { db } from "./admin.js";
 
 export async function getUserPhone() {
@@ -12,12 +13,12 @@ export async function getUserPhone() {
 
     const uniqueUserPhones = [...new Set(userPhones)];
 
-    console.log(uniqueUserPhones);
+    log(uniqueUserPhones);
     
     return uniqueUserPhones;
     
   } catch (error) {
-    console.error("Failed to get user phone\n\n" + error);
+    log("Failed to get user phone\n\n" + error);
   }
 }
 
