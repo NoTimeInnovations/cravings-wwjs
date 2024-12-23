@@ -5,6 +5,7 @@ import { rtdb } from "./admin.js";
 import { getUserPhone } from "./getUserPhone.js";
 import log from "../utils/log.js";
 import { gemini } from "../gemini/gemini.js";
+import { generateImageUrl } from "../utils/generateImage.js";
 
 const { MessageMedia } = wwjs;
 
@@ -33,6 +34,10 @@ async function sendScheduledMessages() {
 
   let aiMessage = null;
 
+  if (!imageUrl) {
+    imageUrl = generateImageUrl();
+  }
+
   let commonPrompt =
     "it should be a short message with a call to action to visit the website and check out the offers. it should be attractive usign emojies message should be funny";
 
@@ -50,7 +55,7 @@ async function sendScheduledMessages() {
       "Create an afternoon offer message for our users at https://www.cravings.live" +
         commonPrompt
     );
-  } else if (hours === 16 && minutes === 0 && seconds === 0) {
+  } else if (hours === 16 && minutes === 31 && seconds === 0) {
     message =
       "🌇 Good Evening! 🌇\n\nUnwind with our special evening offers! 🌟\nDiscover them now at https://www.cravings.live 🍽️";
     aiMessage = await gemini.generateContent(
@@ -61,22 +66,27 @@ async function sendScheduledMessages() {
     return;
   }
 
-  if (aiMessage) {
-    message = aiMessage.response.text();
+  console.log(aiMessage);
+
+  const aiMessageResponse = aiMessage.response.text();
+
+  if (aiMessageResponse) {
+    message = aiMessageResponse;
   }
 
   console.log(message);
-  
 
   const media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
 
-  for (const user of users) {
-    try {
-      await whatsapp.sendMessage(user, message, { media });
-    } catch (error) {
-      log("Failed to send scheduled message to " + user + "\n\n" + error);
-    }
-  }
+  await whatsapp.sendMessage("916282826684@c.us" , message , { media });
+
+  // for (const user of users) {
+  //   try {
+  //     await whatsapp.sendMessage(user, message, { media });
+  //   } catch (error) {
+  //     log("Failed to send scheduled message to " + user + "\n\n" + error);
+  //   }
+  // }
 }
 
 export function startScheduledMessages() {
