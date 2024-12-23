@@ -22,7 +22,7 @@ const whatsapp = new Client({
     ],
   },
   authStrategy: new LocalAuth({
-    clientId: "testing",
+    clientId: "cravings",
   }),
 });
 
