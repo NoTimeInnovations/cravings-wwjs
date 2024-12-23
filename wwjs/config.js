@@ -1,5 +1,5 @@
 import wwcli from "whatsapp-web.js";
-import { ADMIN_CHAT_ID, CLIENT_ID } from "../utils/env.js";
+import { ADMIN_CHAT_ID, ADMINS, CLIENT_ID } from "../utils/env.js";
 import log from "../utils/log.js";
 import { generateQR, writeQRToFile } from "../utils/generateQR.js";
 import commandConfig from "../utils/commandConfig.js";
@@ -22,7 +22,7 @@ const whatsapp = new Client({
     ],
   },
   authStrategy: new LocalAuth({
-    clientId: "cravings",
+    clientId: "testing",
   }),
 });
 
@@ -43,12 +43,16 @@ whatsapp.on("ready", async () => {
 });
 
 whatsapp.on("message_create", async (msg) => {
-  const action = commandConfig[msg.body];
-  if (action) {
-    await action(msg);
+  if (ADMINS.includes(msg.from)) {
+    const command = msg.body.split(" ")[0];
+    const extra = msg.body.split(" ").slice(1).join(" ");
+    const action = commandConfig[command];
+
+    if (action) {
+      await action(msg, extra);
+    }
   }
 });
-
 
 function sendMessage(message, to = ADMIN_CHAT_ID) {
   try {
