@@ -51,6 +51,9 @@ whatsapp.on("message_create", async (msg) => {
     if (action) {
       await action(msg, extra);
     }
+  }else{
+    console.log("Not an admin");
+    
   }
 });
 

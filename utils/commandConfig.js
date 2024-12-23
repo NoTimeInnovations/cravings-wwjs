@@ -48,14 +48,12 @@ async function sendPost(msg, extra) {
 
   const imageUrl = msg.links[0].link;
 
-  console.log(imageUrl, msg.links);
-
   const media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
 
   const message = `🎉 New FoodieOffer Alert! 🎉\n\nDish: ${data.dishName}\nPrice: ${data.newPrice}RS\n\nCheck out our latest offer: https://cravings.live/offers/\n\nHurry, don't miss out! 🏃‍♂️💨`;
 
   const users = ADMINS;
-
+  
   for (const user of users) {
     try {
       await whatsapp.sendMessage(user, message, { media });
