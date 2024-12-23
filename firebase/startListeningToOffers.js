@@ -107,9 +107,9 @@ async function startListeningToOffers() {
     const minutes = now.getMinutes();
     const seconds = now.getSeconds();
     const currentTime = `${hours}:${minutes}:${seconds}`;
-    imageUrl = offer.dishImage;
+    const imgURl = offer.dishImage;
 
-    const media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
+    const media = await MessageMedia.fromUrl(imgURl, { unsafeMime: true });
 
     // Ensure messages are only sent after 8 PM
     if (
