@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import { PORT } from "./utils/env.js";
 import { whatsapp } from "./wwjs/config.js";
 import log from "./utils/log.js";
@@ -24,7 +24,7 @@ app.post("/send-message", async (req, res) => {
     return res.status(400).send("Offer not found");
   }
 
-  console.log(offer);
+  res.status(200).send("got the offer");
 
   const media = await MessageMedia.fromUrl(offer.dishImage, {
     unsafeMime: true,
@@ -34,22 +34,23 @@ app.post("/send-message", async (req, res) => {
   const hours = now.getHours();
   // Ensure messages are only sent after 8 PM
   if (
-    hours >= 15 &&
+    hours >= 20 &&
     Date.now() - new Date(offer.createdAt).getTime() <= 60000
   ) {
-    let alertMsg = "🎉 New FoodieOffer Alert! 🎉";
-    let message = `\n\nDish: ${offer.dishName}\nPrice: ${offer.newPrice}\n\nCheck out our latest offer: https://cravings.live/offers/${offer.id}/\n\nHurry, don't miss out! 🏃‍♂️💨`;
+    const discountPercentage = Math.round(
+      ((offer.originalPrice - offer.newPrice) / offer.originalPrice) * 100
+    );
 
-    const discountPercentage =
-      ((offer.oldPrice - offer.newPrice) / offer.oldPrice) * 100;
+    let alertMsg = "🎉 New FoodieOffer Alert! 🎉";
+    let message = `\n*${offer.dishName}*\n*Price: ₹${offer.newPrice}*\n*Discount: ${discountPercentage}%*\n\nCheck out our latest offer: https://cravings.live/offers/${offer.id}/\n\nHurry, don't miss out! 🏃‍♂️💨`;
 
     try {
       const response = await gemini.generateContent(
-        "generate an message for a latest offer in cravings in single sentace include emojies and make it attractive it should be in funny way. offer dish :" +
+        "generate an message for a latest offer in single sentace include emojies and make it attractive it should be in funny way. offer dish :" +
           offer.dishName +
           "old price :" +
-          offer.oldPrice +
-          "new price :" +
+          offer.originalPrice +
+          "new price : ₹" +
           offer.newPrice +
           "discount percentage" +
           discountPercentage
@@ -66,8 +67,6 @@ app.post("/send-message", async (req, res) => {
 
     let combinedMsg = alertMsg + message;
 
-    console.log("Sending message to users", combinedMsg);
-
     for (const user of users) {
       try {
         await whatsapp.sendMessage(user, combinedMsg, { media });
@@ -76,8 +75,6 @@ app.post("/send-message", async (req, res) => {
       }
     }
   }
-
-  res.sendStatus(200);
 });
 
 app.listen(PORT, () => {
