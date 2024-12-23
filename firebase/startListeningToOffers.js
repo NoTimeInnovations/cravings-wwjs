@@ -1,5 +1,5 @@
 import wwjs from "whatsapp-web.js";
-import { ENV } from "../utils/env.js";
+import { ADMINS, ENV } from "../utils/env.js";
 import { whatsapp } from "../wwjs/config.js";
 import { rtdb } from "./admin.js";
 import { getUserPhone } from "./getUserPhone.js";
@@ -10,12 +10,12 @@ import { generateImageUrl } from "../utils/generateImage.js";
 const { MessageMedia } = wwjs;
 
 // Define users outside to avoid duplication
-let users = [];
+export let users = [];
 let imageUrl;
 
-async function initializeUsers() {
+export async function initializeUsers() {
   if (ENV === "dev") {
-    users = ["916282826684@c.us"];
+    users = ADMINS;
   } else {
     users = await getUserPhone();
   }
@@ -44,24 +44,39 @@ async function sendScheduledMessages() {
   if (hours === 8 && minutes === 0 && seconds === 0) {
     message =
       "🌅 Good Morning! 🌅\n\nExciting new offers are available this morning! 🌟\nCheck them out now at https://www.cravings.live 🍽️";
-    aiMessage = await gemini.generateContent(
-      "Create a morning offer message for our users at https://www.cravings.live" +
-        commonPrompt
-    );
+
+    try {
+      aiMessage = await gemini.generateContent(
+        "Create a morning offer message for our users at https://www.cravings.live" +
+          commonPrompt
+      );
+    } catch (error) {
+      console.error(error);
+    }
   } else if (hours === 12 && minutes === 0 && seconds === 0) {
     message =
       "🌞 Good Afternoon! 🌞\n\nAmazing new offers are available this noon! 🌟\nDon't miss out, check them out at https://www.cravings.live 🍽️";
-    aiMessage = await gemini.generateContent(
-      "Create an afternoon offer message for our users at https://www.cravings.live" +
-        commonPrompt
-    );
+
+    try {
+      aiMessage = await gemini.generateContent(
+        "Create an afternoon offer message for our users at https://www.cravings.live" +
+          commonPrompt
+      );
+    } catch (error) {
+      console.error(error);
+    }
   } else if (hours === 16 && minutes === 31 && seconds === 0) {
     message =
       "🌇 Good Evening! 🌇\n\nUnwind with our special evening offers! 🌟\nDiscover them now at https://www.cravings.live 🍽️";
-    aiMessage = await gemini.generateContent(
-      "Create an evening offer message for our users at https://www.cravings.live" +
-        commonPrompt
-    );
+
+    try {
+      aiMessage = await gemini.generateContent(
+        "Create an evening offer message for our users at https://www.cravings.live" +
+          commonPrompt
+      );
+    } catch (error) {
+      console.error(error);
+    }
   } else {
     return;
   }
@@ -78,7 +93,7 @@ async function sendScheduledMessages() {
 
   const media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
 
-  await whatsapp.sendMessage("916282826684@c.us" , message , { media });
+  await whatsapp.sendMessage("916282826684@c.us", message, { media });
 
   // for (const user of users) {
   //   try {

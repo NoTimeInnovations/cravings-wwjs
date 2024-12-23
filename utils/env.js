@@ -8,7 +8,7 @@ const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID;
 const SERVICE_ACCOUNT_KEY = process.env.SERVICE_ACCOUNT_KEY;
 const CLIENT_ID = "cravings";
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const ADMINS = ["916282826684@c.us", "919447156765@c.us"];
+const ADMINS = ["916282826684@c.us" , "919447156765@c.us"];
 
 export {
   PORT,
