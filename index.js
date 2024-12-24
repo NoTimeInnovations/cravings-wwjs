@@ -5,9 +5,8 @@ import log from "./utils/log.js";
 import wwjs from "whatsapp-web.js";
 const { MessageMedia } = wwjs;
 import cors from "cors";
-import { initializeUsers, users } from "./firebase/startListeningToOffers.js";
+import {  users } from "./firebase/startListeningToOffers.js";
 import { gemini } from "./gemini/gemini.js";
-import { generateImageUrl } from "./utils/generateImage.js";
 
 const app = express();
 app.use(cors("*"));
@@ -19,7 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/image", (req, res) => {
-  res.sendFile("data/ogImage.jpeg", { root: "." });
+  res.sendFile("data/cravings-christmas.jpg", { root: "." });
 })
 
 app.post("/send-message", async (req, res) => {
@@ -51,7 +50,7 @@ app.post("/send-message", async (req, res) => {
   const hours = now.getHours();
   // Ensure messages are only sent after 8 PM
   if (
-    hours >= 12 &&
+    hours >= 20 &&
     Date.now() - new Date(offer.createdAt).getTime() <= 60000
   ) {
     const discountPercentage = Math.round(

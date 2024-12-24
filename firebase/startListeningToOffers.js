@@ -81,6 +81,16 @@ async function sendScheduledMessages() {
     } catch (error) {
       console.error(error);
     }
+  } else if (hours === 24 && minutes === 0 && seconds === 0) {
+    imageUrl = SERVER_URL + "/image";
+    try {
+      aiMessage = await gemini.generateContent(
+        "Create a happy christmas message for the  users of cravings https://www.cravings.live" +
+          commonPrompt
+      );
+    } catch (error) {
+      console.error(error);
+    }
   } else {
     return;
   }
@@ -109,11 +119,13 @@ async function sendScheduledMessages() {
     });
   }
 
-  for (const user of users) {
-    try {
-      await whatsapp.sendMessage(user, message, { media });
-    } catch (error) {
-      log("Failed to send scheduled message to " + user + "\n\n" + error);
+  if (message && media) {
+    for (const user of users) {
+      try {
+        await whatsapp.sendMessage(user, message, { media });
+      } catch (error) {
+        log("Failed to send scheduled message to " + user + "\n\n" + error);
+      }
     }
   }
 }
