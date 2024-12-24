@@ -69,7 +69,7 @@ async function sendScheduledMessages() {
     } catch (error) {
       console.error(error);
     }
-  } else if (hours === 16 && minutes === 31 && seconds === 0) {
+  } else if (hours === 16 && minutes === 30 && seconds === 0) {
     message =
       "🌇 Good Evening! 🌇\n\nUnwind with our special evening offers! 🌟\nDiscover them now at https://www.cravings.live 🍽️";
 
@@ -83,6 +83,8 @@ async function sendScheduledMessages() {
     }
   } else if (hours === 24 && minutes === 0 && seconds === 0) {
     imageUrl = SERVER_URL + "/image";
+    message = "🎄 Merry Christmas! 🎄\n\nWishing you a day filled with joy and happiness! 🎅🎁\nVisit https://www.cravings.live to celebrate with us! 🍽️";
+
     try {
       aiMessage = await gemini.generateContent(
         "Create a happy christmas message for the  users of cravings https://www.cravings.live" +
