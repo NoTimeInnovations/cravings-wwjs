@@ -46,6 +46,8 @@ async function sendScheduledMessages() {
     "it should be a short message with a call to action to visit the website and check out the offers. it should be attractive usign emojies message should be funny";
 
   if (hours === 8 && minutes === 0 && seconds === 0) {
+    let foodItem = await generateRandomFoodItem();
+    imageUrl = generateImageUrl(foodItem);
     message =
       "🌅 Good Morning! 🌅\n\nExciting new offers are available this morning! 🌟\nCheck them out now at https://www.cravings.live 🍽️";
 
@@ -58,6 +60,8 @@ async function sendScheduledMessages() {
       console.error(error);
     }
   } else if (hours === 12 && minutes === 0 && seconds === 0) {
+    let foodItem = await generateRandomFoodItem();
+    imageUrl = generateImageUrl(foodItem);
     message =
       "🌞 Good Afternoon! 🌞\n\nAmazing new offers are available this noon! 🌟\nDon't miss out, check them out at https://www.cravings.live 🍽️";
 
@@ -70,6 +74,8 @@ async function sendScheduledMessages() {
       console.error(error);
     }
   } else if (hours === 16 && minutes === 30 && seconds === 0) {
+    let foodItem = await generateRandomFoodItem();
+    imageUrl = generateImageUrl(foodItem);
     message =
       "🌇 Good Evening! 🌇\n\nUnwind with our special evening offers! 🌟\nDiscover them now at https://www.cravings.live 🍽️";
 
