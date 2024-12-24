@@ -84,11 +84,6 @@ app.post("/send-message", async (req, res) => {
 
     let combinedMsg = alertMsg + message;
 
-    console.log(users);
-
-    await whatsapp.sendMessage(users[0] , combinedMsg, { media });
-    
-
     for (const user of users) {
       try {
         await whatsapp.sendMessage(user, combinedMsg, { media });
