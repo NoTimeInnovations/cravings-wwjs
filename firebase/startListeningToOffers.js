@@ -42,6 +42,9 @@ async function sendScheduledMessages() {
     imageUrl = generateImageUrl(foodItem);
   }
 
+  console.log(hours, minutes, seconds);
+  
+
   let commonPrompt =
     "it should be a short message with a call to action to visit the website and check out the offers. it should be attractive and christmas themed usign emojies message should be funny";
 
@@ -82,18 +85,6 @@ async function sendScheduledMessages() {
     try {
       aiMessage = await gemini.generateContent(
         "Create an evening offer message for our users at https://www.cravings.live" +
-          commonPrompt
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  } else if (hours === 24 && minutes === 0 && seconds === 0) {
-    imageUrl = SERVER_URL + "/image";
-    message = "🎄 Merry Christmas! 🎄\n\nWishing you a day filled with joy and happiness! 🎅🎁\nVisit https://www.cravings.live to celebrate with us! 🍽️";
-
-    try {
-      aiMessage = await gemini.generateContent(
-        "Create a happy christmas message for the  users of cravings https://www.cravings.live" +
           commonPrompt
       );
     } catch (error) {
