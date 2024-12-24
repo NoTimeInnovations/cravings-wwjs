@@ -43,7 +43,7 @@ async function sendScheduledMessages() {
   }
 
   let commonPrompt =
-    "it should be a short message with a call to action to visit the website and check out the offers. it should be attractive usign emojies message should be funny";
+    "it should be a short message with a call to action to visit the website and check out the offers. it should be attractive and christmas themed usign emojies message should be funny";
 
   if (hours === 8 && minutes === 0 && seconds === 0) {
     let foodItem = await generateRandomFoodItem();

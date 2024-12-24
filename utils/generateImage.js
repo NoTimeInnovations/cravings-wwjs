@@ -1,6 +1,6 @@
 export const generateImageUrl = async (foodItem) => {
   const prompt =
-    "Generate an image unique food item. it should be realistic of" + foodItem;
+    "Generate an image unique food item image should be chritmas themed. it should be realistic of" + foodItem;
   const width = 400;
   const height = 400;
   const seed = 344;
