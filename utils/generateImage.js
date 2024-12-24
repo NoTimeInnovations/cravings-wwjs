@@ -1,9 +1,9 @@
-export const generateImageUrl = () => {
+export const generateImageUrl = async (foodItem) => {
   const prompt =
-    'Generate an image of tasty food item';
-  const width = 350;
-  const height = 195;
-  const seed = new Date().getTime();
+    "Generate an image unique food item. it should be realistic of" + foodItem;
+  const width = 400;
+  const height = 400;
+  const seed = 344;
   const model = "flux";
 
   const imageUrl = `https://pollinations.ai/p/${encodeURIComponent(
@@ -11,4 +11,23 @@ export const generateImageUrl = () => {
   )}?width=${width}&height=${height}&seed=${seed}&model=${model}`;
 
   return imageUrl;
+};
+
+export const generateRandomFoodItem = async () => {
+  let foodItems = [];
+
+  const foodItemResponse = await fetch(
+    `https://text.pollinations.ai/${encodeURIComponent(
+      "generate a single word single item food item indian not" +
+        foodItems.join(",")
+    )}`
+  );
+  let foodItem = null;
+  if (foodItemResponse.ok) {
+    foodItem = await foodItemResponse.text();
+  }
+
+  foodItems.push(foodItem);
+
+  return foodItem;
 };

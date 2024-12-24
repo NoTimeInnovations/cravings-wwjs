@@ -1,12 +1,13 @@
-import express, { response } from "express";
-import { PORT } from "./utils/env.js";
+import express from "express";
+import { PORT, SERVER_URL } from "./utils/env.js";
 import { whatsapp } from "./wwjs/config.js";
 import log from "./utils/log.js";
 import wwjs from "whatsapp-web.js";
 const { MessageMedia } = wwjs;
 import cors from "cors";
-import { users } from "./firebase/startListeningToOffers.js";
+import { initializeUsers, users } from "./firebase/startListeningToOffers.js";
 import { gemini } from "./gemini/gemini.js";
+import { generateImageUrl } from "./utils/generateImage.js";
 
 const app = express();
 app.use(cors("*"));
@@ -17,6 +18,10 @@ app.get("/", (req, res) => {
   res.sendFile("pages/login.html", { root: "." });
 });
 
+app.get("/image", (req, res) => {
+  res.sendFile("data/ogImage.jpeg", { root: "." });
+})
+
 app.post("/send-message", async (req, res) => {
   const { offer } = req.body;
 
@@ -26,15 +31,27 @@ app.post("/send-message", async (req, res) => {
 
   res.status(200).send("got the offer");
 
-  const media = await MessageMedia.fromUrl(offer.dishImage, {
-    unsafeMime: true,
-  });
+  let media = null;
+
+  try {
+    media = await MessageMedia.fromUrl(offer.dishImage, {
+      unsafeMime: true,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
+  if (!media) {
+    media = await MessageMedia.fromUrl( SERVER_URL + '/image', {
+      unsafeMime: true,
+    });
+  }
 
   const now = new Date();
   const hours = now.getHours();
   // Ensure messages are only sent after 8 PM
   if (
-    hours >= 20 &&
+    hours >= 12 &&
     Date.now() - new Date(offer.createdAt).getTime() <= 60000
   ) {
     const discountPercentage = Math.round(
@@ -66,6 +83,11 @@ app.post("/send-message", async (req, res) => {
     }
 
     let combinedMsg = alertMsg + message;
+
+    console.log(users);
+
+    await whatsapp.sendMessage(users[0] , combinedMsg, { media });
+    
 
     for (const user of users) {
       try {

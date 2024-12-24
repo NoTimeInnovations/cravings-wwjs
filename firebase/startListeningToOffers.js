@@ -1,11 +1,14 @@
 import wwjs from "whatsapp-web.js";
-import { ADMINS, ENV } from "../utils/env.js";
+import { ADMINS, ENV, SERVER_URL } from "../utils/env.js";
 import { whatsapp } from "../wwjs/config.js";
 import { rtdb } from "./admin.js";
 import { getUserPhone } from "./getUserPhone.js";
 import log from "../utils/log.js";
 import { gemini } from "../gemini/gemini.js";
-import { generateImageUrl } from "../utils/generateImage.js";
+import {
+  generateImageUrl,
+  generateRandomFoodItem,
+} from "../utils/generateImage.js";
 
 const { MessageMedia } = wwjs;
 
@@ -35,7 +38,8 @@ async function sendScheduledMessages() {
   let aiMessage = null;
 
   if (!imageUrl) {
-    imageUrl = generateImageUrl();
+    let foodItem = await generateRandomFoodItem();
+    imageUrl = generateImageUrl(foodItem);
   }
 
   let commonPrompt =
@@ -91,17 +95,27 @@ async function sendScheduledMessages() {
 
   console.log(message);
 
-  const media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
+  let media = null;
 
-  await whatsapp.sendMessage("916282826684@c.us", message, { media });
+  try {
+    media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
+  } catch (error) {
+    console.log(error);
+  }
 
-  // for (const user of users) {
-  //   try {
-  //     await whatsapp.sendMessage(user, message, { media });
-  //   } catch (error) {
-  //     log("Failed to send scheduled message to " + user + "\n\n" + error);
-  //   }
-  // }
+  if (!media) {
+    media = await MessageMedia.fromUrl(SERVER_URL + "/image", {
+      unsafeMime: true,
+    });
+  }
+
+  for (const user of users) {
+    try {
+      await whatsapp.sendMessage(user, message, { media });
+    } catch (error) {
+      log("Failed to send scheduled message to " + user + "\n\n" + error);
+    }
+  }
 }
 
 export function startScheduledMessages() {
