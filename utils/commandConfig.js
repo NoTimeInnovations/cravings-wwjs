@@ -92,6 +92,7 @@ const commandDescriptions = {
   "#users": "View the users",
   "#post": "Post a new offer message",
   "#help": "View the list of commands",
+  "#ai": "Get AI help (can be used with a quoted message)",
 };
 
 async function help(msg) {
