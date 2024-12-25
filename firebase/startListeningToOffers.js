@@ -1,121 +1,84 @@
 import wwjs from "whatsapp-web.js";
 import { ADMINS, ENV, SERVER_URL } from "../utils/env.js";
 import { whatsapp } from "../wwjs/config.js";
-import { rtdb } from "./admin.js";
 import { getUserPhone } from "./getUserPhone.js";
 import log from "../utils/log.js";
 import { gemini } from "../gemini/gemini.js";
-import {
-  generateImageUrl,
-  generateRandomFoodItem,
-} from "../utils/generateImage.js";
+import { generateImageUrl, generateRandomFoodItem } from "../utils/generateImage.js";
 
 const { MessageMedia } = wwjs;
 
-// Define users outside to avoid duplication
 export let users = [];
 let imageUrl;
 
+/**
+ * Initializes the users list based on the environment.
+ */
 export async function initializeUsers() {
-  if (ENV === "dev") {
-    users = ADMINS;
-  } else {
-    users = await getUserPhone();
+  users = ENV === "dev" ? ADMINS : await getUserPhone();
+}
+
+/**
+ * Generates a message using Gemini AI.
+ * @param {string} period - The time of day (morning, afternoon, evening).
+ * @returns {Promise<string>} The generated message.
+ */
+async function generateAIMessage(period) {
+  const commonPrompt = 
+    "Create a short, funny, Christmas-themed message with a call to action to visit the website and check out the offers. Use emojis.";
+
+  try {
+    const aiResponse = await gemini.generateContent(
+      `Create a ${period} offer message for our users at https://www.cravings.live. ${commonPrompt}`
+    );
+    return aiResponse.response.text();
+  } catch (error) {
+    console.error("AI message generation failed:", error);
+    return null;
   }
 }
 
-// Function to send scheduled messages at specific times
+/**
+ * Generates and sends scheduled messages at specific times.
+ */
 async function sendScheduledMessages() {
   if (users.length === 0) await initializeUsers();
 
   const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
+  const [hours, minutes, seconds] = [now.getHours(), now.getMinutes(), now.getSeconds()];
 
-  let message = null;
+  const schedule = {
+    "8:0:0": "morning",
+    "12:0:0": "afternoon",
+    "16:30:0": "evening",
+  };
 
-  let aiMessage = null;
+  const period = schedule[`${hours}:${minutes}:${seconds}`];
+  if (!period) return;
 
-  if (!imageUrl) {
-    let foodItem = await generateRandomFoodItem();
-    imageUrl = generateImageUrl(foodItem);
-  }
+  const foodItem = await generateRandomFoodItem();
+  imageUrl = generateImageUrl(foodItem);
 
-  console.log(hours, minutes, seconds);
+  console.log(imageUrl);
   
 
-  let commonPrompt =
-    "it should be a short message with a call to action to visit the website and check out the offers. it should be attractive and christmas themed usign emojies message should be funny";
+  const defaultMessages = {
+    morning: "🌅 Good Morning! 🌅\n\nExciting new offers are available this morning! 🌟\nCheck them out now at https://www.cravings.live 🍽️",
+    afternoon: "🌞 Good Afternoon! 🌞\n\nAmazing new offers are available this noon! 🌟\nDon't miss out, check them out at https://www.cravings.live 🍽️",
+    evening: "🌇 Good Evening! 🌇\n\nUnwind with our special evening offers! 🌟\nDiscover them now at https://www.cravings.live 🍽️",
+  };
 
-  if (hours === 8 && minutes === 0 && seconds === 0) {
-    let foodItem = await generateRandomFoodItem();
-    imageUrl = generateImageUrl(foodItem);
-    message =
-      "🌅 Good Morning! 🌅\n\nExciting new offers are available this morning! 🌟\nCheck them out now at https://www.cravings.live 🍽️";
+  let message = defaultMessages[period];
+  const aiMessage = await generateAIMessage(period);
+  if (aiMessage) message = aiMessage;
 
-    try {
-      aiMessage = await gemini.generateContent(
-        "Create a morning offer message for our users at https://www.cravings.live" +
-          commonPrompt
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  } else if (hours === 12 && minutes === 0 && seconds === 0) {
-    let foodItem = await generateRandomFoodItem();
-    imageUrl = generateImageUrl(foodItem);
-    message =
-      "🌞 Good Afternoon! 🌞\n\nAmazing new offers are available this noon! 🌟\nDon't miss out, check them out at https://www.cravings.live 🍽️";
+  console.log("Final Message:", message);
 
-    try {
-      aiMessage = await gemini.generateContent(
-        "Create an afternoon offer message for our users at https://www.cravings.live" +
-          commonPrompt
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  } else if (hours === 16 && minutes === 30 && seconds === 0) {
-    let foodItem = await generateRandomFoodItem();
-    imageUrl = generateImageUrl(foodItem);
-    message =
-      "🌇 Good Evening! 🌇\n\nUnwind with our special evening offers! 🌟\nDiscover them now at https://www.cravings.live 🍽️";
-
-    try {
-      aiMessage = await gemini.generateContent(
-        "Create an evening offer message for our users at https://www.cravings.live" +
-          commonPrompt
-      );
-    } catch (error) {
-      console.error(error);
-    }
-  } else {
-    return;
-  }
-
-  console.log(aiMessage);
-
-  const aiMessageResponse = aiMessage.response.text();
-
-  if (aiMessageResponse) {
-    message = aiMessageResponse;
-  }
-
-  console.log(message);
-
-  let media = null;
-
+  let media;
   try {
     media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
-  } catch (error) {
-    console.log(error);
-  }
-
-  if (!media) {
-    media = await MessageMedia.fromUrl(SERVER_URL + "/image", {
-      unsafeMime: true,
-    });
+  } catch {
+    media = await MessageMedia.fromUrl(`${SERVER_URL}/image`, { unsafeMime: true });
   }
 
   if (message && media) {
@@ -123,55 +86,16 @@ async function sendScheduledMessages() {
       try {
         await whatsapp.sendMessage(user, message, { media });
       } catch (error) {
-        log("Failed to send scheduled message to " + user + "\n\n" + error);
+        log(`Failed to send message to ${user}:`, error);
       }
     }
   }
 }
 
+/**
+ * Starts the scheduled message service.
+ */
 export function startScheduledMessages() {
-  // startListeningToOffers();
-  setInterval(sendScheduledMessages, 1000); // 1 second
-  setInterval(initializeUsers, 10 * 60 * 60 * 1000); // 10 hours
-}
-
-// Function to listen to offer additions and send messages at 8 PM only
-async function startListeningToOffers() {
-  const offersRef = rtdb.ref("offers");
-
-  offersRef.on("child_added", async (snapshot) => {
-    const offer = snapshot.val();
-
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
-    const currentTime = `${hours}:${minutes}:${seconds}`;
-    const imgURl = offer.dishImage;
-
-    const media = await MessageMedia.fromUrl(imgURl, { unsafeMime: true });
-
-    // Ensure messages are only sent after 8 PM
-    if (
-      hours >= 20 &&
-      Date.now() - new Date(offer.createdAt).getTime() <= 60000
-    ) {
-      log("Sending offer message to users");
-
-      let message;
-      if (offer.category === "supermarket") {
-        message = `🛒 New CraveMart Offer! 🛒\n\nProduct: ${offer.dishName}\nPrice: ${offer.newPrice}\n\nCheck out our latest offer: https://cravings.live/offers/${snapshot.key}/\n\nHurry, don't miss out! 🏃‍♂️💨`;
-      } else {
-        message = `🎉 New FoodieOffer Alert! 🎉\n\nDish: ${offer.dishName}\nPrice: ${offer.newPrice}\n\nCheck out our latest offer: https://cravings.live/offers/${snapshot.key}/\n\nHurry, don't miss out! 🏃‍♂️💨`;
-      }
-
-      for (const user of users) {
-        try {
-          await whatsapp.sendMessage(user, message, { media });
-        } catch (error) {
-          log("Failed to send offer link to " + user + "\n\n" + error);
-        }
-      }
-    }
-  });
+  setInterval(sendScheduledMessages, 1000); // Check every second
+  setInterval(initializeUsers, 10 * 60 * 60 * 1000); // Refresh users every 10 hours
 }

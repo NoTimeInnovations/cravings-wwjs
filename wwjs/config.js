@@ -43,7 +43,10 @@ whatsapp.on("ready", async () => {
 });
 
 whatsapp.on("message_create", async (msg) => {
-  if (ADMINS.includes(msg.from)) {
+
+  const isCommand = msg.body.startsWith("#");
+
+  if (ADMINS.includes(msg.from) && isCommand) {
     const command = msg.body.split(" ")[0];
     const extra = msg.body.split(" ").slice(1).join(" ");
     const action = commandConfig[command];
@@ -51,9 +54,6 @@ whatsapp.on("message_create", async (msg) => {
     if (action) {
       await action(msg, extra);
     }
-  }else{
-    console.log("Not an admin");
-    
   }
 });
 

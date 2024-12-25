@@ -5,7 +5,7 @@ import log from "./utils/log.js";
 import wwjs from "whatsapp-web.js";
 const { MessageMedia } = wwjs;
 import cors from "cors";
-import {  users } from "./firebase/startListeningToOffers.js";
+import { users } from "./firebase/startListeningToOffers.js";
 import { gemini } from "./gemini/gemini.js";
 
 const app = express();
@@ -19,76 +19,88 @@ app.get("/", (req, res) => {
 
 app.get("/image", (req, res) => {
   res.sendFile("data/cravings-christmas.jpg", { root: "." });
-})
+});
 
 app.post("/send-message", async (req, res) => {
   const { offer } = req.body;
 
+  // Validate request body
   if (!offer) {
     return res.status(400).send("Offer not found");
   }
 
-  res.status(200).send("got the offer");
+  res.status(200).send("Offer received");
 
-  let media = null;
+  let media;
 
+  // Fetch media from the offer or fallback to default
   try {
-    media = await MessageMedia.fromUrl(offer.dishImage, {
-      unsafeMime: true,
-    });
+    media = await MessageMedia.fromUrl(offer.dishImage, { unsafeMime: true });
   } catch (error) {
-    console.log(error);
-  }
-
-  if (!media) {
-    media = await MessageMedia.fromUrl( SERVER_URL + '/image', {
-      unsafeMime: true,
-    });
+    console.error("Failed to fetch media from URL:", error);
+    try {
+      media = await MessageMedia.fromUrl(`${SERVER_URL}/image`, {
+        unsafeMime: true,
+      });
+    } catch (fallbackError) {
+      console.error("Failed to fetch fallback media:", fallbackError);
+      return; // Exit if no media is available
+    }
   }
 
   const now = new Date();
-  const hours = now.getHours();
-  // Ensure messages are only sent after 8 PM
-  if (
-    hours >= 20 &&
-    Date.now() - new Date(offer.createdAt).getTime() <= 60000
-  ) {
-    const discountPercentage = Math.round(
-      ((offer.originalPrice - offer.newPrice) / offer.originalPrice) * 100
+  const currentHour = now.getHours();
+
+  // Ensure messages are sent only after 8 PM and within 1 minute of offer creation
+  const isAfter8PM = currentHour >= 20;
+  const isRecentOffer =
+    Date.now() - new Date(offer.createdAt).getTime() <= 60000;
+
+  if (!isAfter8PM || !isRecentOffer) {
+    console.log("Message not sent: Conditions not met");
+    return;
+  }
+
+  // Calculate discount percentage
+  const discountPercentage = Math.round(
+    ((offer.originalPrice - offer.newPrice) / offer.originalPrice) * 100
+  );
+
+  // Default alert message
+  let alertMsg = "🎉 New FoodieOffer Alert! 🎉";
+  const message = `
+*${offer.dishName}*
+*Price: ₹${offer.newPrice}*
+*Discount: ${discountPercentage}%*
+
+Check out our latest offer: https://cravings.live/offers/${offer.id}/
+
+Hurry, don't miss out! 🏃‍♂️💨`;
+
+  // Generate an AI-based alert message
+  try {
+    const response = await gemini.generateContent(
+      `Generate a funny and attractive single-sentence message with emojis for the following offer:
+      Dish: ${offer.dishName}, Old Price: ₹${offer.originalPrice}, New Price: ₹${offer.newPrice}, Discount: ${discountPercentage}%`
     );
 
-    let alertMsg = "🎉 New FoodieOffer Alert! 🎉";
-    let message = `\n*${offer.dishName}*\n*Price: ₹${offer.newPrice}*\n*Discount: ${discountPercentage}%*\n\nCheck out our latest offer: https://cravings.live/offers/${offer.id}/\n\nHurry, don't miss out! 🏃‍♂️💨`;
-
-    try {
-      const response = await gemini.generateContent(
-        "generate an message for a latest offer in single sentace include emojies and make it attractive it should be in funny way. offer dish :" +
-          offer.dishName +
-          "old price :" +
-          offer.originalPrice +
-          "new price : ₹" +
-          offer.newPrice +
-          "discount percentage" +
-          discountPercentage
-      );
-      const data = await response.response.text();
-      console.log(data);
-
-      if (data) {
-        alertMsg = data;
-      }
-    } catch (error) {
-      console.error(error);
+    const aiMessage = await response.response.text();
+    if (aiMessage) {
+      alertMsg = aiMessage;
     }
+  } catch (error) {
+    console.error("Failed to generate AI message:", error);
+  }
 
-    let combinedMsg = alertMsg + message;
+  const combinedMessage = `${alertMsg}\n${message}`;
 
-    for (const user of users) {
-      try {
-        await whatsapp.sendMessage(user, combinedMsg, { media });
-      } catch (error) {
-        log("Failed to send offer link to " + user + "\n\n" + error);
-      }
+  // Send message to all users
+  for (const user of users) {
+    try {
+      await whatsapp.sendMessage(user, combinedMessage, { media });
+      console.log(`Message sent to ${user}`);
+    } catch (error) {
+      log(`Failed to send offer to ${user}:`, error);
     }
   }
 });

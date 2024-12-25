@@ -1,4 +1,4 @@
-export const generateImageUrl = async (foodItem) => {
+export const generateImageUrl = (foodItem) => {
   const prompt =
     "Generate an image unique food item image should be chritmas themed. it should be realistic of" + foodItem;
   const width = 400;
