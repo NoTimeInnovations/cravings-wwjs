@@ -65,7 +65,7 @@ async function sendPost(msg, extra) {
 
 async function aiHelp(msg, extra) {
   const message = extra;
-  const quotedMsg = msg._data.quotedMsg.body || msg._data.quotedMsg.caption;
+  const quotedMsg = msg?._data?.quotedMsg?.body || msg?._data?.quotedMsg?.caption || "";
   
   const query= `${quotedMsg} ${message}`;
 

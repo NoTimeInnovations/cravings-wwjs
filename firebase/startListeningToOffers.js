@@ -25,7 +25,7 @@ export async function initializeUsers() {
  */
 async function generateAIMessage(period) {
   const commonPrompt = 
-    "Create a short, funny, Christmas-themed message with a call to action to visit the website and check out the offers. Use emojis.";
+    "Create a short, funny,message with a call to action to visit the website and check out the offers. Use emojis.";
 
   try {
     const aiResponse = await gemini.generateContent(
@@ -48,9 +48,9 @@ async function sendScheduledMessages() {
   const [hours, minutes, seconds] = [now.getHours(), now.getMinutes(), now.getSeconds()];
 
   const schedule = {
-    "8:0:0": "morning",
-    "12:0:0": "afternoon",
-    "16:30:0": "evening",
+    "21:31:0": "morning",
+    "21:32:0": "afternoon",
+    "21:33:0": "evening",
   };
 
   const period = schedule[`${hours}:${minutes}:${seconds}`];

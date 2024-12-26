@@ -1,6 +1,6 @@
 export const generateImageUrl = (foodItem) => {
   const prompt =
-    "Generate an image unique food item image should be chritmas themed. it should be realistic of" + foodItem;
+    "Generate an image unique food item image should be. it should be realistic of" + foodItem;
   const width = 400;
   const height = 400;
   const seed = 344;
@@ -13,9 +13,9 @@ export const generateImageUrl = (foodItem) => {
   return imageUrl;
 };
 
-export const generateRandomFoodItem = async () => {
-  let foodItems = [];
+let foodItems = ['Samoosa'];
 
+export const generateRandomFoodItem = async () => {
   const foodItemResponse = await fetch(
     `https://text.pollinations.ai/${encodeURIComponent(
       "generate a single word single item food item indian not" +
@@ -28,6 +28,9 @@ export const generateRandomFoodItem = async () => {
   }
 
   foodItems.push(foodItem);
+
+  console.log("Generated Food Item:", foodItem);
+  
 
   return foodItem;
 };
