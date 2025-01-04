@@ -25,5 +25,6 @@ admin.initializeApp({
 
 const db = admin.firestore();
 const rtdb = admin.database();
+const fcm = admin.messaging();
 
-export { admin, db, rtdb };
+export { admin, db, rtdb , fcm };

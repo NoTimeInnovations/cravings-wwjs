@@ -4,6 +4,7 @@ import log from "../utils/log.js";
 import { generateQR, writeQRToFile } from "../utils/generateQR.js";
 import commandConfig from "../utils/commandConfig.js";
 import { startScheduledMessages } from "../firebase/startListeningToOffers.js";
+import { watchCollectionForChanges } from "../firebase/fcMessaging.js";
 
 const { Client, LocalAuth } = wwcli;
 
@@ -39,11 +40,11 @@ whatsapp.on("ready", async () => {
   log("Client is ready!");
   sendMessage("Client is ready!");
   writeQRToFile("<h1>Client is ready!</h1>");
-  await startScheduledMessages();
+  startScheduledMessages();
+  watchCollectionForChanges();
 });
 
 whatsapp.on("message_create", async (msg) => {
-
   const isCommand = msg.body.startsWith("#");
 
   if (ADMINS.includes(msg.from) && isCommand) {
