@@ -1,3 +1,4 @@
+import { sendMessage } from "../wwjs/config.js";
 import { fcm, db } from "./admin.js";
 
 const watchCollectionForChanges = async () => {
@@ -12,8 +13,23 @@ const watchCollectionForChanges = async () => {
           const offerData = doc.data();
           const isRecentOffer =
             Date.now() - new Date(offerData.createdAt).getTime() <= 60000;
+          const dataUrlregex = /^data:image\/\w+;base64,/;
 
           if (isRecentOffer) {
+            let imageUrl = offerData.dishImage;
+
+            console.log(offerData.dishImage);
+            console.log(dataUrlregex.test(offerData.dishImage));
+
+            if (
+              offerData.dishImage &&
+              !dataUrlregex.test(offerData.dishImage)
+            ) {
+              imageUrl = offerData.dishImage;
+            } else {
+              imageUrl = undefined;
+            }
+
             const message = {
               topic: "offers",
               notification: {
@@ -23,9 +39,19 @@ const watchCollectionForChanges = async () => {
                   offerData.hotelName +
                   "! Discount: " +
                   offerData.newPrice,
-                imageUrl: offerData.dishImage,
+                imageUrl: imageUrl,
+              },
+              android: {
+                notification: {
+                  imageUrl: imageUrl,
+                  icon: "ic_stat_logo",
+                  color: "#EA580C",
+                  priority: "high", 
+                },
               },
             };
+
+            console.log(message);
 
             fcm
               .send(message)
@@ -34,6 +60,9 @@ const watchCollectionForChanges = async () => {
               })
               .catch((error) => {
                 console.error("Error sending notification:", error);
+                sendMessage(
+                  "Error sending notification: " + offerData.dishName
+                );
               });
           }
         } else {
@@ -43,5 +72,7 @@ const watchCollectionForChanges = async () => {
     });
   });
 };
+
+watchCollectionForChanges();
 
 export { watchCollectionForChanges };
