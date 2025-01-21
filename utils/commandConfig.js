@@ -88,7 +88,7 @@ async function deleteLastMsg(msg, extra) {
     for (const chat of chats) {
       if (chat.lastMessage.body.includes(msgToDelete)) {
         try {
-          const msgs = await chat.fetchMessages({ limit: 1 });
+          const msgs = await chat.fetchMessages({ limit: 1 , fromMe: true});
           const msg = msgs[0];
           await msg.delete(true);
         } catch (error) {
@@ -102,7 +102,7 @@ async function deleteLastMsg(msg, extra) {
     for (const chat of chats) {
       if (chat.id.user === filter) {
         try {
-          const msgs = await chat.fetchMessages({ limit: 1 });
+          const msgs = await chat.fetchMessages({ limit: 1 , fromMe: true});
           const msg = msgs[0];
           console.log(msg);
           
