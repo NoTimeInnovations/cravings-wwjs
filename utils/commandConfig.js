@@ -5,6 +5,7 @@ import { getUserPhone } from "../firebase/getUserPhone.js";
 import { gemini, geminiJson } from "../gemini/gemini.js";
 import wwjs from "whatsapp-web.js";
 import { ADMINS } from "./env.js";
+import { sendToUsers } from "../test.js";
 const { MessageMedia } = wwjs;
 
 function test(msg, extra) {
@@ -124,6 +125,7 @@ const commandConfig = {
   "#help": help,
   "#ai": aiHelp,
   "#delete-last-msg": deleteLastMsg,
+  "#send-audio-link" : sendToUsers
 };
 
 const commandDescriptions = {
@@ -135,6 +137,7 @@ const commandDescriptions = {
   "#help": "View the list of commands",
   "#ai": "Get AI help (can be used with a quoted message)",
   "#delete-last-msg": "Delete last message of all chats",
+  "#send-audio-link" : "Send audio and link to users"
 };
 
 async function help(msg) {

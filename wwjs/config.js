@@ -48,8 +48,6 @@ whatsapp.on("ready", async () => {
   setInterval(initializeUsers, 2 * 60 * 60 * 1000); 
   initializeUsers();
   // await addLabel();
-
-  // await sendToUsers();
 });
 
 whatsapp.on("message_create", async (msg) => {
