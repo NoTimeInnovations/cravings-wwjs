@@ -1,6 +1,7 @@
 import log from "../utils/log.js";
 import { db } from "./admin.js";
 import { whatsapp } from "../wwjs/config.js";
+import { ADMINS } from "../utils/env.js";
 
 export async function getUserPhone() {
   try {

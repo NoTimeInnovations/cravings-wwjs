@@ -6,6 +6,7 @@ import commandConfig from "../utils/commandConfig.js";
 import { initializeUsers, startScheduledMessages } from "../firebase/startListeningToOffers.js";
 import { watchCollectionForChanges } from "../firebase/fcMessaging.js";
 import { addLabel } from "../add.js";
+import { getAdmins } from "../firebase/getUserPhone.js";
 
 const { Client, LocalAuth } = wwcli;
 
@@ -50,8 +51,8 @@ whatsapp.on("ready", async () => {
 
 whatsapp.on("message_create", async (msg) => {
   const isCommand = msg.body.startsWith("#");
-
-  if (ADMINS.includes(msg.from) && isCommand) {
+  const admins = await getAdmins();
+  if (admins.includes(msg.from) && isCommand) {
     const command = msg.body.split(" ")[0];
     const extra = msg.body.split(" ").slice(1).join(" ");
     const action = commandConfig[command];
