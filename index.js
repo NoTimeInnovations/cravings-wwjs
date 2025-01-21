@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/image", (req, res) => {
-  res.sendFile("data/cravings-christmas.jpg", { root: "." });
+  res.sendFile("data/ogImage.jpeg", { root: "." });
 });
 
 app.post("/send-message", async (req, res) => {
@@ -105,6 +105,34 @@ Hurry, don't miss out! 🏃‍♂️💨`;
   }
 });
 
+app.post("/whatsapp-to-user", async (req, res) => {
+  const { user, message } = req.body;
+
+  // Validate request body
+  if (!user || !message) {
+    return res.status(400).send("User or message not found");
+  }
+
+  res.status(200).send("Message sending initiated");
+
+  let userPhone;
+
+  const trimmedPhone = user?.replace(/^(\+91|0)/, "").replace(/\s+/g, "");
+  if (trimmedPhone) {
+    userPhone = `91${trimmedPhone}@c.us`;
+  } else {
+    return res.status(400).send("Invalid phone number");
+  }
+
+  try {
+    await whatsapp.sendMessage(userPhone, message);
+    console.log(`Message sent to ${userPhone}`);
+  } catch (error) {
+    log(`Failed to send message to ${userPhone}:`, error);
+  }
+});
+
 app.listen(PORT, () => {
   log(`Server is running on port ${PORT}`);
 });
+

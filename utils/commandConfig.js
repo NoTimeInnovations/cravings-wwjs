@@ -65,14 +65,56 @@ async function sendPost(msg, extra) {
 
 async function aiHelp(msg, extra) {
   const message = extra;
-  const quotedMsg = msg?._data?.quotedMsg?.body || msg?._data?.quotedMsg?.caption || "";
-  
-  const query= `${quotedMsg} ${message}`;
+  const quotedMsg =
+    msg?._data?.quotedMsg?.body || msg?._data?.quotedMsg?.caption || "";
+
+  const query = `${quotedMsg} ${message}`;
 
   const response = await gemini.generateContent(query);
   const data = response.response.text();
 
   sendMessage(data, msg.from);
+}
+
+async function deleteLastMsg(msg, extra) {
+  const chats = await whatsapp.getChats();
+  let filter = extra.split(" ")[0];
+  const msgToDelete = extra.split(" ").slice(1).join(" ");
+
+  console.log(filter);
+  console.log(msgToDelete);
+
+  if (filter === "all") {
+    for (const chat of chats) {
+      if (chat.lastMessage.body.includes(msgToDelete)) {
+        try {
+          const msgs = await chat.fetchMessages({ limit: 1 });
+          const msg = msgs[0];
+          await msg.delete(true);
+        } catch (error) {
+          console.log(
+            "Failed to delete last message of " + chat.name + "\n\n" + error
+          );
+        }
+      }
+    }
+  } else {
+    for (const chat of chats) {
+      if (chat.id.user === filter) {
+        try {
+          const msgs = await chat.fetchMessages({ limit: 1 });
+          const msg = msgs[0];
+          console.log(msg);
+          
+          await msg.delete(true);
+        } catch (error) {
+          console.log(
+            "Failed to delete last message of " + chat.name + "\n\n" + error
+          );
+        }
+      }
+    }
+  }
 }
 
 const commandConfig = {
@@ -83,6 +125,7 @@ const commandConfig = {
   "#post": sendPost,
   "#help": help,
   "#ai": aiHelp,
+  "#delete-last-msg": deleteLastMsg,
 };
 
 const commandDescriptions = {
@@ -93,6 +136,7 @@ const commandDescriptions = {
   "#post": "Post a new offer message",
   "#help": "View the list of commands",
   "#ai": "Get AI help (can be used with a quoted message)",
+  "#delete-last-msg": "Delete last message of all chats",
 };
 
 async function help(msg) {

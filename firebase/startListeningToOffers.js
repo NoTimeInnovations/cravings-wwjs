@@ -96,6 +96,6 @@ async function sendScheduledMessages() {
  * Starts the scheduled message service.
  */
 export function startScheduledMessages() {
-  setInterval(sendScheduledMessages, 1000); // Check every second
+  // setInterval(sendScheduledMessages, 1000);
   setInterval(initializeUsers, 10 * 60 * 60 * 1000); // Refresh users every 10 hours
 }
