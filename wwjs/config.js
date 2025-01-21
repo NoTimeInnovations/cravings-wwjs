@@ -3,8 +3,9 @@ import { ADMIN_CHAT_ID, ADMINS, CLIENT_ID } from "../utils/env.js";
 import log from "../utils/log.js";
 import { generateQR, writeQRToFile } from "../utils/generateQR.js";
 import commandConfig from "../utils/commandConfig.js";
-import { startScheduledMessages } from "../firebase/startListeningToOffers.js";
+import { initializeUsers, startScheduledMessages } from "../firebase/startListeningToOffers.js";
 import { watchCollectionForChanges } from "../firebase/fcMessaging.js";
+import { addLabel } from "../add.js";
 
 const { Client, LocalAuth } = wwcli;
 
@@ -40,8 +41,11 @@ whatsapp.on("ready", async () => {
   log("Client is ready!");
   sendMessage("Client is ready!");
   writeQRToFile("<h1>Client is ready!</h1>");
-  startScheduledMessages();
+  // startScheduledMessages();
   watchCollectionForChanges();
+  setInterval(initializeUsers, 2 * 60 * 60 * 1000); 
+  initializeUsers();
+  // await addLabel();
 });
 
 whatsapp.on("message_create", async (msg) => {

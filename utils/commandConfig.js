@@ -104,8 +104,6 @@ async function deleteLastMsg(msg, extra) {
         try {
           const msgs = await chat.fetchMessages({ limit: 1 , fromMe: true});
           const msg = msgs[0];
-          console.log(msg);
-          
           await msg.delete(true);
         } catch (error) {
           console.log(

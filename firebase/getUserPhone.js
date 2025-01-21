@@ -1,6 +1,6 @@
 import log from "../utils/log.js";
 import { db } from "./admin.js";
-import { ADMINS } from "../utils/env.js";
+import { whatsapp } from "../wwjs/config.js";
 
 export async function getUserPhone() {
   try {
@@ -10,6 +10,7 @@ export async function getUserPhone() {
       .where("phone", "!=", "")
       .get();
 
+    const ADMINS = await getAdmins();
     const users = userSnapshot.docs.map((doc) => doc.data());
     var userPhones = users
       .map((user) => {
@@ -28,4 +29,10 @@ export async function getUserPhone() {
   } catch (error) {
     log("Failed to get user phone\n\n" + error);
   }
+}
+
+export async function getAdmins() {
+  let users = await whatsapp.getChatsByLabelId("9");
+  users = users.map((user) => user.id._serialized);
+  return users;
 }

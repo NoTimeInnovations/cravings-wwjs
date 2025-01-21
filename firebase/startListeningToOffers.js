@@ -1,10 +1,13 @@
 import wwjs from "whatsapp-web.js";
 import { ADMINS, ENV, SERVER_URL } from "../utils/env.js";
 import { whatsapp } from "../wwjs/config.js";
-import { getUserPhone } from "./getUserPhone.js";
+import { getAdmins, getUserPhone } from "./getUserPhone.js";
 import log from "../utils/log.js";
 import { gemini } from "../gemini/gemini.js";
-import { generateImageUrl, generateRandomFoodItem } from "../utils/generateImage.js";
+import {
+  generateImageUrl,
+  generateRandomFoodItem,
+} from "../utils/generateImage.js";
 
 const { MessageMedia } = wwjs;
 
@@ -15,7 +18,8 @@ let imageUrl;
  * Initializes the users list based on the environment.
  */
 export async function initializeUsers() {
-  users = ENV === "dev" ? ADMINS : await getUserPhone();
+  console.log("Initializing users...");
+  users = ENV === "dev" ? await getAdmins() : await getUserPhone();
 }
 
 /**
@@ -24,7 +28,7 @@ export async function initializeUsers() {
  * @returns {Promise<string>} The generated message.
  */
 async function generateAIMessage(period) {
-  const commonPrompt = 
+  const commonPrompt =
     "Create a short, funny,message with a call to action to visit the website and check out the offers. Use emojis.";
 
   try {
@@ -45,7 +49,11 @@ async function sendScheduledMessages() {
   if (users.length === 0) await initializeUsers();
 
   const now = new Date();
-  const [hours, minutes, seconds] = [now.getHours(), now.getMinutes(), now.getSeconds()];
+  const [hours, minutes, seconds] = [
+    now.getHours(),
+    now.getMinutes(),
+    now.getSeconds(),
+  ];
 
   const schedule = {
     "8:0:0": "morning",
@@ -60,12 +68,14 @@ async function sendScheduledMessages() {
   imageUrl = generateImageUrl(foodItem);
 
   console.log(imageUrl);
-  
 
   const defaultMessages = {
-    morning: "🌅 Good Morning! 🌅\n\nExciting new offers are available this morning! 🌟\nCheck them out now at https://www.cravings.live 🍽️",
-    afternoon: "🌞 Good Afternoon! 🌞\n\nAmazing new offers are available this noon! 🌟\nDon't miss out, check them out at https://www.cravings.live 🍽️",
-    evening: "🌇 Good Evening! 🌇\n\nUnwind with our special evening offers! 🌟\nDiscover them now at https://www.cravings.live 🍽️",
+    morning:
+      "🌅 Good Morning! 🌅\n\nExciting new offers are available this morning! 🌟\nCheck them out now at https://www.cravings.live 🍽️",
+    afternoon:
+      "🌞 Good Afternoon! 🌞\n\nAmazing new offers are available this noon! 🌟\nDon't miss out, check them out at https://www.cravings.live 🍽️",
+    evening:
+      "🌇 Good Evening! 🌇\n\nUnwind with our special evening offers! 🌟\nDiscover them now at https://www.cravings.live 🍽️",
   };
 
   let message = defaultMessages[period];
@@ -78,7 +88,9 @@ async function sendScheduledMessages() {
   try {
     media = await MessageMedia.fromUrl(imageUrl, { unsafeMime: true });
   } catch {
-    media = await MessageMedia.fromUrl(`${SERVER_URL}/image`, { unsafeMime: true });
+    media = await MessageMedia.fromUrl(`${SERVER_URL}/image`, {
+      unsafeMime: true,
+    });
   }
 
   if (message && media) {
@@ -96,6 +108,5 @@ async function sendScheduledMessages() {
  * Starts the scheduled message service.
  */
 export function startScheduledMessages() {
-  // setInterval(sendScheduledMessages, 1000);
-  setInterval(initializeUsers, 10 * 60 * 60 * 1000); // Refresh users every 10 hours
+  setInterval(sendScheduledMessages, 1000);
 }
