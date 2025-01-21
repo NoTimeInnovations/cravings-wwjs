@@ -51,7 +51,7 @@ whatsapp.on("ready", async () => {
 
 whatsapp.on("message_create", async (msg) => {
   const isCommand = msg.body.startsWith("#");
-  const admins = await getAdmins();
+  let admins = ADMINS;
   if (admins.includes(msg.from) && isCommand) {
     const command = msg.body.split(" ")[0];
     const extra = msg.body.split(" ").slice(1).join(" ");
@@ -61,6 +61,8 @@ whatsapp.on("message_create", async (msg) => {
       await action(msg, extra);
     }
   }
+
+  admins = await getAdmins();
 });
 
 function sendMessage(message, to = ADMIN_CHAT_ID) {
