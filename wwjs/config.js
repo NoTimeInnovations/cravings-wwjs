@@ -7,6 +7,7 @@ import { initializeUsers, startScheduledMessages } from "../firebase/startListen
 import { watchCollectionForChanges } from "../firebase/fcMessaging.js";
 import { addLabel } from "../add.js";
 import { getAdmins } from "../firebase/getUserPhone.js";
+import { sendToUsers } from "../test.js";
 
 const { Client, LocalAuth } = wwcli;
 
@@ -47,6 +48,8 @@ whatsapp.on("ready", async () => {
   setInterval(initializeUsers, 2 * 60 * 60 * 1000); 
   initializeUsers();
   // await addLabel();
+
+  // await sendToUsers();
 });
 
 whatsapp.on("message_create", async (msg) => {
