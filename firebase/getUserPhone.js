@@ -35,11 +35,9 @@ export async function getUserPhone() {
 export async function getAdmins() {
   try {
     let labels = await whatsapp.getLabels();
-    console.log("Labels : ", labels);
     let label = labels.find((label) => label.name === "Admins");
     let users = await whatsapp.getChatsByLabelId(`${label.id}`);
     users = users.map((user) => user.id._serialized);
-    console.log("Admins : ", users);
     return users;
   } catch (error) {
     console.error("Error fetching admins:", error);
