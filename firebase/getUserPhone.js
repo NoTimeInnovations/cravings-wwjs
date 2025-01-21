@@ -33,7 +33,12 @@ export async function getUserPhone() {
 }
 
 export async function getAdmins() {
-  let users = await whatsapp.getChatsByLabelId("9");
-  users = users.map((user) => user.id._serialized);
-  return users;
+  try {
+    let users = await whatsapp.getChatsByLabelId("9");
+    users = users.map((user) => user.id._serialized);
+    return users;
+  } catch (error) {
+    console.error("Error fetching admins:", error);
+    return ADMINS;
+  }
 }
