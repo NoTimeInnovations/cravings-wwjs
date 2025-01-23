@@ -68,7 +68,10 @@ const watchCollectionForChanges = async () => {
                 );
               });
 
-            sendMessageOnWhatsapp(offerData);
+            sendMessageOnWhatsapp({
+              id : doc.id,
+              ...offerData
+            });
           }
         } else {
           console.log("No such document!");
