@@ -5,14 +5,20 @@ import log from "./utils/log.js";
 import wwjs from "whatsapp-web.js";
 const { MessageMedia } = wwjs;
 import cors from "cors";
-import { users } from "./firebase/startListeningToOffers.js";
-import { gemini } from "./gemini/gemini.js";
 import { db } from "./firebase/admin.js";
+import cron from "node-cron";
+import { deleteInactiveAccounts } from "./firebase/deleteInactiveAccount.js";
 
 const app = express();
 app.use(cors("*"));
 app.use(express.json());
 whatsapp.initialize();
+
+cron.schedule("0 0 * * *", () => {
+  console.log("Running scheduled account deletion check...");
+  deleteInactiveAccounts();
+});
+
 
 app.get("/", (req, res) => {
   res.sendFile("pages/login.html", { root: "." });
