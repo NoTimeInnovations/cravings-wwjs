@@ -32,6 +32,7 @@ mongoose.connect(process.env.MONGO_URI).then(() => {
     authStrategy: new RemoteAuth({
       store: store,
       backupSyncIntervalMs: 300000,
+      clientId: process.env.CLIENT_ID || "dev",
     }),
   });
 
