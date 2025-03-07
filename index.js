@@ -8,8 +8,10 @@ import cors from "cors";
 import { db } from "./firebase/admin.js";
 import cron from "node-cron";
 import { deleteInactiveAccounts } from "./firebase/deleteInactiveAccount.js";
+import awsRouter from "./aws/route.js";
 
 const app = express();
+const router = express.Router();
 app.use(cors("*"));
 app.use(express.json());
 // whatsapp.initialize();
@@ -19,16 +21,19 @@ cron.schedule("0 0 * * *", () => {
   deleteInactiveAccounts();
 });
 
+app.use("/", router);
+app.use("/aws", awsRouter);
 
-app.get("/", (req, res) => {
+
+router.get("/", (req, res) => {
   res.sendFile("pages/login.html", { root: "." });
 });
 
-app.get("/image", (req, res) => {
+router.get("/image", (req, res) => {
   res.sendFile("data/ogImage.jpeg", { root: "." });
 });
 
-app.post("/offerAlert", async (req, res) => {
+router.post("/offerAlert", async (req, res) => {
     const { offer , hotel } = req.body;
 
     const followers = hotel?.followers;
@@ -56,7 +61,7 @@ app.post("/offerAlert", async (req, res) => {
     res.status(200).send("Message sending initiated!");
 });
 
-app.post("/whatsapp-to-user", async (req, res) => {
+router.post("/whatsapp-to-user", async (req, res) => {
   const { to, messageType , from } = req.body;
 
   // Validate request body
